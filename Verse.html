@@ -1,181 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Verse of the Day</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    margin: 0;
-    text-align: center;
-    color: #333;
-  }
-  header {
-    background: #3b5998;
-    color: white;
-    padding: 15px;
-  }
-  #verse-box {
-    position: relative;
-    background: url('https://source.unsplash.com/featured/?church,bible') center/cover no-repeat;
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 20px;
-    border-radius: 10px;
-    min-height: 140px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    color: black;
-  }
-  #verse-box::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(255,255,255,0.85);
-    border-radius: 10px;
-    z-index: 0;
-  }
-  #verse-box > * {
-    position: relative;
-    z-index: 1;
-  }
-  #verse-text {
-    font-size: 20px;
-    line-height: 1.4em;
-  }
-  #verse-ref {
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  #search-section {
-    margin: 30px auto;
-    max-width: 400px;
-  }
-  #search {
-    width: 70%;
-    padding: 10px;
-    border: 1px solid #999;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  button {
-    padding: 10px 15px;
-    background: #3b5998;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
-    margin-left: 10px;
-  }
-  button:hover {
-    background: #2e4373;
-  }
-  #result {
-    margin-top: 20px;
-    min-height: 120px;
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    text-align: left;
-    white-space: pre-wrap;
-    color: #111;
-  }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Verse of the Day</title>
+    <style>
+        :root {
+            --primary: #4a69bd;
+            --primary-dark: #1e3799;
+            --bg: #f0f2f5;
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #2f3640;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        main {
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* Verse Card Styling */
+        #verse-box {
+            background: linear-gradient(135deg, #6a89cc, #4a69bd);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            color: white;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .glass-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #verse-text {
+            font-size: 1.25rem;
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        #verse-ref {
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: right;
+            display: block;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: white; color: var(--primary); }
+        .btn-primary:hover { background: #eee; }
+        
+        .btn-search { background: var(--primary); color: white; margin-top: 10px; width: 100%; }
+        .btn-search:hover { background: var(--primary-dark); }
+
+        /* Search Section */
+        #search-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #444;
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+            display: none; /* Hidden until search */
+        }
+
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
 </head>
 <body>
 
 <header>
-  <h1>📖 Verse of the Day</h1>
+    <h1>📖 Scripture App</h1>
 </header>
 
 <main>
-  <section id="verse-box">
-    <p id="verse-text">Loading a random verse...</p>
-    <p id="verse-ref"></p>
-    <button onclick="loadRandomVerse()">🔄 New Random Verse</button>
-    <button id="share-btn" onclick="shareVerse()">📤 Share Verse</button>
-  </section>
+    <section id="verse-box">
+        <div class="glass-content">
+            <div id="verse-text">Fetching inspiration...</div>
+            <div id="verse-ref"></div>
+        </div>
+        <div class="controls">
+            <button class="btn-primary" onclick="loadRandomVerse()">🔄 Refresh</button>
+            <button class="btn-primary" onclick="shareVerse()">📤 Share</button>
+        </div>
+    </section>
 
-  <section id="search-section">
-    <h2>🔍 Search the Bible</h2>
-    <input type="text" id="search" placeholder="e.g. Romans 8:28" aria-label="Search Bible verse" />
-    <button onclick="searchVerse()">Search</button>
-    <div id="result"></div>
-  </section>
+    <section id="search-section">
+        <h2 style="margin-top:0">🔍 Search the Bible</h2>
+        <input type="text" id="search" placeholder="e.g. John 3:16" onkeypress="if(event.key === 'Enter') searchVerse()" />
+        <button class="btn-search" onclick="searchVerse()">Search Passage</button>
+        <div id="result"></div>
+    </section>
 </main>
 
 <script>
-  async function loadRandomVerse() {
-    const verseTextEl = document.getElementById("verse-text");
-    const verseRefEl = document.getElementById("verse-ref");
-    verseTextEl.innerHTML = "Loading...";
-    verseRefEl.innerHTML = "";
+    // Unified API source for better consistency
+    const API_URL = "https://bible-api.com";
 
-    try {
-      const res = await fetch('https://labs.bible.org/api/?passage=random&type=json');
-      if (!res.ok) throw new Error("Failed to fetch random verse");
-      const data = await res.json();
-      const verseObj = data[0];
-      const text = verseObj.text;
-      const ref = `${verseObj.bookname} ${verseObj.chapter}:${verseObj.verse}`;
-      verseTextEl.innerHTML = `"${text.trim()}"`;
-      verseRefEl.innerHTML = ref;
-    } catch (err) {
-      verseTextEl.innerHTML = "Failed to load verse.";
-      verseRefEl.innerHTML = "";
-      console.error(err);
+    async function loadRandomVerse() {
+        const textEl = document.getElementById("verse-text");
+        const refEl = document.getElementById("verse-ref");
+        const box = document.getElementById("verse-box");
+
+        box.classList.add("loading");
+        textEl.innerText = "Finding a word for you...";
+        refEl.innerText = "";
+
+        try {
+            // Note: bible-api.com doesn't have a native 'random' endpoint, 
+            // so we use a curated list of inspiring verses for the 'Random' feel
+            const randomVerses = ["John 3:16", "Romans 8:28", "Philippians 4:13", "Psalm 23:1", "Jeremiah 29:11", "Matthew 11:28", "Proverbs 3:5", "Isaiah 41:10"];
+            const randomPick = randomVerses[Math.floor(Math.random() * randomVerses.length)];
+            
+            const res = await fetch(`${API_URL}${randomPick}`);
+            const data = await res.json();
+            
+            textEl.innerText = `"${data.text.trim()}"`;
+            refEl.innerText = `— ${data.reference}`;
+        } catch (err) {
+            textEl.innerText = "Couldn't reach the server. Try again?";
+        } finally {
+            box.classList.remove("loading");
+        }
     }
-  }
 
-  async function searchVerse() {
-    const query = document.getElementById("search").value.trim();
-    const resultEl = document.getElementById("result");
-    if (!query) {
-      alert("Please enter a verse reference (e.g. John 3:16).");
-      return;
+    async function searchVerse() {
+        const query = document.getElementById("search").value.trim();
+        const resultEl = document.getElementById("result");
+        
+        if (!query) return;
+
+        resultEl.style.display = "block";
+        resultEl.innerHTML = "<i>Searching...</i>";
+
+        try {
+            const res = await fetch(`${API_URL}${encodeURIComponent(query)}`);
+            const data = await res.json();
+
+            if (!data.text) {
+                resultEl.innerHTML = "❌ <b>Verse not found.</b> Check your spelling (e.g., 'Gen 1:1').";
+            } else {
+                resultEl.innerHTML = `<strong>${data.reference}</strong><br>"${data.text.trim()}"`;
+            }
+        } catch (err) {
+            resultEl.innerHTML = "❌ Error connecting to the Bible database.";
+        }
     }
-    resultEl.innerHTML = "Searching...";
-    try {
-      const res = await fetch(`https://bible-api.com/${encodeURIComponent(query)}`);
-      if (!res.ok) throw new Error("Verse not found");
-      const data = await res.json();
-      if (data.error) {
-        resultEl.innerHTML = "❌ Verse not found.";
-      } else {
-        resultEl.innerHTML = `"${data.text.trim()}"\n— ${data.reference}`;
-      }
-    } catch (err) {
-      resultEl.innerHTML = "Error fetching verse.";
-      console.error(err);
+
+    function shareVerse() {
+        const text = document.getElementById("verse-text").innerText;
+        const ref = document.getElementById("verse-ref").innerText;
+        const content = `${text} ${ref}`;
+
+        if (navigator.share) {
+            navigator.share({ title: 'Daily Scripture', text: content });
+        } else {
+            navigator.clipboard.writeText(content);
+            alert("Copied to clipboard!");
+        }
     }
-  }
 
-  function shareVerse() {
-    const verseText = document.getElementById("verse-text").innerText;
-    const verseRef = document.getElementById("verse-ref").innerText;
-    const shareContent = `${verseText} — ${verseRef}`;
-
-    if (navigator.share) {
-      navigator.share({
-        title: 'Verse of the Day',
-        text: shareContent
-        // Note: no 'url' here, so URL won't show in share dialog
-      }).catch(console.error);
-    } else {
-      navigator.clipboard.writeText(shareContent).then(() => {
-        alert("Verse copied to clipboard! You can now paste it anywhere to share.");
-      }).catch(() => {
-        alert("Sharing not supported, but here is the verse:\n\n" + shareContent);
-      });
-    }
-  }
-
-
-  loadRandomVerse();
+    // Initial Load
+    loadRandomVerse();
 </script>
 
 </body>
